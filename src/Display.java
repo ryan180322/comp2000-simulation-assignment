@@ -14,4 +14,9 @@ public class Display extends JPanel {
         ));
         this.setBackground(Color.BLACK);
     }
+
+    public void update(Grid grid) {
+        this.grid = grid;
+        repaint();
+    }
 }
