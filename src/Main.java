@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import java.util.Random;
 
+@SuppressWarnings("unused")
 public class Main extends JPanel {
     private Grid grid;
     private Display display;
