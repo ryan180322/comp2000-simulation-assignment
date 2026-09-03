@@ -78,7 +78,7 @@ public class Grid {
         public SnapshotGrid(Cell[][] snapshot) { this.snapshot = snapshot; }
         public Grid getCell(int x, int y) {
             if (x < 0 || x >= Grid.this.width || y < 0 || y >= Grid.this.height) return null;
-            output = new Grid(snapshot.length,snapshot[0].length);
+            output = new Grid(Grid.this.width,Grid.this.height);
             output.cells = snapshot;
             return output;
         }
