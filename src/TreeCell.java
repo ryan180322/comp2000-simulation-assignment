@@ -10,7 +10,7 @@ public class TreeCell extends Cell {
     public int getAge() { return age; }
 
     @Override
-    public void update(Grid grid) {
+    public void update(Grid snapGrid, Grid grid) {
         age = Math.min(age + 1, MAX_AGE);
 
         // hardcoded
@@ -23,7 +23,7 @@ public class TreeCell extends Cell {
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
         for (int i = 0; i < 4; i++) {
-            Cell neighbour = grid.getCell(x + dx[i], y + dy[i]);
+            Cell neighbour = snapGrid.getCell(x + dx[i], y + dy[i]);
             if (neighbour instanceof FireCell) {
                 if (Math.random() < 0.15) {
                     grid.setCell(x, y, new FireCell(x, y));

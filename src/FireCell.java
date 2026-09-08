@@ -1,6 +1,6 @@
 public class FireCell extends Cell {
     private int burnTime;
-    private static final int MAX_BURN_TIME = 3;
+    private static final int MAX_BURN_TIME = 10;
 
     public FireCell(int x, int y) {
         super(x, y);
@@ -8,7 +8,7 @@ public class FireCell extends Cell {
     }
 
     @Override
-    public void update(Grid grid) {
+    public void update(Grid snapGrid, Grid grid) {
         burnTime--;
 
         if (burnTime <= 0) {
@@ -16,7 +16,7 @@ public class FireCell extends Cell {
             return;
         }
 
-        // hardcoded
+        /*/ hardcoded
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
         for (int i = 0; i < 4; i++) {
@@ -26,14 +26,14 @@ public class FireCell extends Cell {
                     grid.setCell(x + dx[i], y + dy[i], new FireCell(x + dx[i], y + dy[i]));
                 }
             }
-        }
+        }*/
     }
 
     @Override
     public java.awt.Color getColor() {
         float t = (float) burnTime / MAX_BURN_TIME;
         int r = 255;
-        int g = (int) (255 * t);
+        int g = Math.clamp((int) (255 * t), 0, 255);
         return new java.awt.Color(r, g, 0);
     }
 }

@@ -2,7 +2,6 @@ public class Grid {
     private final int width;
     private final int height;
 
-    @SuppressWarnings("unused")
     private Cell[][] cells;
 
     public Grid(int width, int height) {
@@ -53,7 +52,7 @@ public class Grid {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Cell cell = cells[x][y];
-                cell.update(new SnapshotGrid(snapshot).getCell(x, y));
+                cell.update(new SnapshotGrid(snapshot).createGrid(), this);
             }
         }
 
@@ -76,11 +75,21 @@ public class Grid {
         private final Cell[][] snapshot;
         private Grid output;
         public SnapshotGrid(Cell[][] snapshot) { this.snapshot = snapshot; }
-        public Grid getCell(int x, int y) {
-            if (x < 0 || x >= Grid.this.width || y < 0 || y >= Grid.this.height) return null;
+        public Grid createGrid() {
             output = new Grid(Grid.this.width,Grid.this.height);
             output.cells = snapshot;
             return output;
         }
+    }
+
+    public String toString() {
+        String output = "";
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                output += cells[j][i];
+            }
+            output += "\n";
+        }
+        return output;
     }
 }

@@ -7,12 +7,14 @@ public class Main extends JPanel {
     private Display display;
     private boolean running = false;
     private Timer timer;
+    private static final int WIDTH = 25;
+    private static final int HEIGHT = 25;
     private static final int TICK_DELAY = 100;
 
     public Main() {
         setLayout(new BorderLayout());
 
-        grid = new Grid(100, 100);
+        grid = new Grid(WIDTH, HEIGHT);
         display = new Display(grid);
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -52,7 +54,7 @@ public class Main extends JPanel {
 
     private void resetSimulation() {
         stopSimulation();
-        grid = new Grid(100, 100);
+        grid = new Grid(WIDTH, HEIGHT);
         display.update(grid);
     }
 
@@ -62,8 +64,7 @@ public class Main extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(sim);
         frame.setResizable(false);
-        frame.setSize(500, 600);
-        //frame.pack();
+        frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }

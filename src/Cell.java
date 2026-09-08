@@ -10,6 +10,6 @@ public abstract class Cell {
     public int getX() { return x; }
     public int getY() { return y; }
 
-    public abstract void update(Grid grid);
+    public abstract void update(Grid snapGrid, Grid grid);
     public abstract java.awt.Color getColor();
 }
