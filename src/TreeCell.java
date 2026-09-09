@@ -23,12 +23,16 @@ public class TreeCell extends Cell {
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
         for (int i = 0; i < 4; i++) {
-            Cell neighbour = snapGrid.getCell(x + dx[i], y + dy[i]);
-            if (neighbour instanceof FireCell) {
-                if (Math.random() < 0.15) {
-                    grid.setCell(x, y, new FireCell(x, y));
-                    return;
+            try {
+                Cell neighbour = snapGrid.getCell(x + dx[i], y + dy[i]);
+                if (neighbour instanceof FireCell) {
+                    if (Math.random() < 0.1) {
+                        grid.setCell(x, y, new FireCell(x, y));
+                    }
                 }
+            } catch (InvalidGridPositionException e) {
+                //System.out.println(e);
+                continue;
             }
         }
     }

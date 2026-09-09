@@ -15,18 +15,6 @@ public class FireCell extends Cell {
             grid.setCell(x, y, new EmptyCell(x, y));
             return;
         }
-
-        /*/ hardcoded
-        int[] dx = {-1, 1, 0, 0};
-        int[] dy = {0, 0, -1, 1};
-        for (int i = 0; i < 4; i++) {
-            Cell neighbour = grid.getCell(x + dx[i], y + dy[i]);
-            if (neighbour instanceof TreeCell) {
-                if (Math.random() < 0.6) {
-                    grid.setCell(x + dx[i], y + dy[i], new FireCell(x + dx[i], y + dy[i]));
-                }
-            }
-        }*/
     }
 
     @Override

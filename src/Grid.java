@@ -29,14 +29,19 @@ public class Grid {
     }
 
     public Cell getCell(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) return null;
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            //return null;
+            throw new InvalidGridPositionException(x, y, width, height);
+        }
         return cells[x][y];
     }
 
     public void setCell(int x, int y, Cell newCell) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            cells[x][y] = newCell;
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            //return null;
+            throw new InvalidGridPositionException(x, y, width, height);
         }
+        cells[x][y] = newCell;
     }
 
     public void tick() {
