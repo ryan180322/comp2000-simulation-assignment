@@ -19,6 +19,14 @@ public class Main extends JPanel {
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
+        JButton startBtn = new JButton("Start");
+        JButton stopBtn = new JButton("Stop");
+        JButton resetBtn = new JButton("Reset");
+
+        startBtn.addActionListener(e -> startSimulation());
+        stopBtn.addActionListener(e -> stopSimulation());
+        resetBtn.addActionListener(e -> resetSimulation());
+
         JComboBox<WindDirection> windBox = new JComboBox<>();
         windBox.addItem(WindDirection.NONE);
         windBox.addItem(WindDirection.NORTH);
@@ -29,14 +37,6 @@ public class Main extends JPanel {
             WindDirection dir = (WindDirection) windBox.getSelectedItem();
             grid.setWindType(dir == WindDirection.NONE ? new NoWind() : new CardinalWind(dir));
         });
-
-        JButton startBtn = new JButton("Start");
-        JButton stopBtn = new JButton("Stop");
-        JButton resetBtn = new JButton("Reset");
-
-        startBtn.addActionListener(e -> startSimulation());
-        stopBtn.addActionListener(e -> stopSimulation());
-        resetBtn.addActionListener(e -> resetSimulation());
 
         controls.add(startBtn);
         controls.add(stopBtn);
