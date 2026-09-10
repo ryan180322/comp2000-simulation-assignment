@@ -4,7 +4,7 @@ public class EmptyCell extends Cell {
     }
 
     @Override
-    public void update(Grid snapGrid, Grid grid) {
+    public void update(Grid snapGrid, Grid grid, WindType wind) {
         // nothing by themselves, change from grid
     }
     

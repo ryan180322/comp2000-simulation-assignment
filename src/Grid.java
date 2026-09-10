@@ -1,15 +1,29 @@
 public class Grid {
     private final int width;
     private final int height;
-
     private Cell[][] cells;
+    private final double treeGrowthRate;
+    private WindType windType;
 
     public Grid(int width, int height) {
+        this(width, height, new NoWind());
+    }
+
+    public Grid(int width, int height, WindType windType) {
+        this(width, height, 0.005, windType);
+    }
+
+    public Grid(int width, int height, double treeGrowthRate, WindType windType) {
         this.width = width;
         this.height = height;
+        this.treeGrowthRate = treeGrowthRate;
+        this.windType = windType;
         this.cells = new Cell[width][height];
         initialize();
     }
+
+    public WindType getWindType() { return windType; }
+    public void setWindType(WindType w) { this.windType = w; }
 
     private void initialize() {
         for (int x = 0; x < width; x++) {
@@ -30,7 +44,6 @@ public class Grid {
 
     public Cell getCell(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            //return null;
             throw new InvalidGridPositionException(x, y, width, height);
         }
         return cells[x][y];
@@ -38,7 +51,6 @@ public class Grid {
 
     public void setCell(int x, int y, Cell newCell) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
-            //return null;
             throw new InvalidGridPositionException(x, y, width, height);
         }
         cells[x][y] = newCell;
@@ -57,7 +69,7 @@ public class Grid {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Cell cell = cells[x][y];
-                cell.update(new SnapshotGrid(snapshot).createGrid(), this);
+                cell.update(new SnapshotGrid(snapshot).createGrid(), this, windType);
             }
         }
 
@@ -65,7 +77,7 @@ public class Grid {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (cells[x][y] instanceof EmptyCell) {
-                    if (Math.random() < 0.005) {
+                    if (Math.random() < treeGrowthRate) {
                         cells[x][y] = new TreeCell(x, y);
                     }
                 }

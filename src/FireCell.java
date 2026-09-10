@@ -8,7 +8,7 @@ public class FireCell extends Cell {
     }
 
     @Override
-    public void update(Grid snapGrid, Grid grid) {
+    public void update(Grid snapGrid, Grid grid, WindType wind) {
         burnTime--;
 
         if (burnTime <= 0) {
