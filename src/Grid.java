@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Grid {
     private final int width;
     private final int height;
@@ -29,14 +32,14 @@ public class Grid {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 // hardcoded
-                if (Math.random() < 0.7) {
+                if (Math.random() < 0.5) {
                     cells[x][y] = new TreeCell(x, y);
                 } else {
                     cells[x][y] = new EmptyCell(x, y);
                 }
             }
         }
-        // Place a single fire
+        // Place a single fire at centre
         int cx = width / 2;
         int cy = height / 2;
         cells[cx][cy] = new FireCell(cx, cy);
@@ -73,7 +76,7 @@ public class Grid {
             }
         }
 
-        // grow tree, hardcoded
+        // grow tree
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (cells[x][y] instanceof EmptyCell) {
@@ -87,6 +90,22 @@ public class Grid {
 
     public int getWidth() { return width; }
     public int getHeight() { return height; }
+
+    public List<Integer> getStats() {
+        int trees = 0, fires = 0, empties = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (cells[x][y] instanceof TreeCell) trees++;
+                else if (cells[x][y] instanceof FireCell) fires++;
+                else if (cells[x][y] instanceof EmptyCell) empties++;
+            }
+        }
+        List<Integer> stats = new ArrayList<>();
+        stats.add(trees);
+        stats.add(fires);
+        stats.add(empties);
+        return stats;
+    }
 
     private class SnapshotGrid {
         private final Cell[][] snapshot;
