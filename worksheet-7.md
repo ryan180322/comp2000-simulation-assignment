@@ -13,9 +13,16 @@
 **1.1.** Paste the first 10 lines of the output of `git log --graph --oneline --all` from your repository:
 
 ```
-
-
-
+* cec19d0 (HEAD -> main, origin/main, origin/HEAD) worksheet
+* 3cda443 statistics label
+* 1c5b609 Update Main.java
+* e03aa0c wind
+* bb605a4 exceptions
+* cab01ef fix display and grid snapshot
+* ffde8fa fix
+* c950505 Update Main.java
+* 76ba6b8 doesnt work yet
+* 89b634c structures
 ```
 
 **1.2.** Describe your workflow. Did you use branches? Pull requests?
@@ -138,6 +145,8 @@ for (int i = 0; i < 4; i++) {
 ## 5. Uniqueness and Creativity
 
 **5.1.** List everything you added to the project that was not part of the in-class activities.
+
+java awt/swing
 
 **5.2.** Which feature required the most independent research or problem-solving? What did you learn from it?
 
