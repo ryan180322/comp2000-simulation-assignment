@@ -61,7 +61,7 @@ InvalidGridPositionException inherits RuntimeException.
 
 
 
-**2.4.** Paste one code snippet that demonstrates your use of polymorphism or encapsulation.  Include an explanation of _how_ this demonstrates polymorphim or encapsulation.  Give a reference to a provided reading that talks about this type of polymorphism or encapsulation.
+**2.4.** Paste one code snippet that demonstrates your use of polymorphism or encapsulation. Include an explanation of _how_ this demonstrates polymorphim or encapsulation.  Give a reference to a provided reading that talks about this type of polymorphism or encapsulation.
 
 ```
 public abstract class Cell {
