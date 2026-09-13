@@ -134,7 +134,7 @@ for (int i = 0; i < 4; i++) {
 
 **4.1.** Attach or link your log book entries for Weeks 1–6.
 
-
+![Log Book](logbook.md)
 
 **4.2.** Which week's activity taught you the most? What did you learn?
 
