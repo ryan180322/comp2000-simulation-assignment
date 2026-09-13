@@ -1,10 +1,10 @@
 # COMP2000 Worksheet 1 — Mid-Semester Submission
 
-**Student name:**
+**Student name: Ryan Ouyang**
 
-**Student ID:**
+**Student ID: 49169513**
 
-**GitHub repo URL:**
+**GitHub repo URL: https://github.com/ryan180322/comp2000-simulation-assignment**
 
 ---
 
@@ -31,7 +31,7 @@ I forked the team repository and worked from there.
 
 **1.3.** Estimate the percentage of commits you contributed relative to the total in your repository.
 
-I did a different simulation to my team.
+I did a different simulation from my team because I alread started designing my project before the team fork was available, so I decided to stick with my own design.
 
 ---
 
@@ -59,7 +59,7 @@ InvalidGridPositionException inherits RuntimeException.
 
 **2.3.** Pick the class that you think has the best design. Explain why.
 
-
+I think CardinalWind has the best design. It encapsulates wind direction logic in one place, so wind behaviour is not scattered across other classes. To add a new wind type, I can create a new class implementing WindType without changing Grid/TreeCell. TreeCell can call getSpreadMultiplier() without knowing which WindType implementation was used.
 
 **2.4.** Paste one code snippet that demonstrates your use of polymorphism or encapsulation. Include an explanation of _how_ this demonstrates polymorphim or encapsulation.  Give a reference to a provided reading that talks about this type of polymorphism or encapsulation.
 
@@ -146,8 +146,14 @@ for (int i = 0; i < 4; i++) {
 
 **5.1.** List everything you added to the project that was not part of the in-class activities.
 
-java awt/swing
+JComboBox of wind directions that allows users to change wind direction at runtime.
+
+Jlabel that shows statistics using List<Integer>.
+
+Show how long FireCell/TreeCell have burned/lived for by changing colour.
 
 **5.2.** Which feature required the most independent research or problem-solving? What did you learn from it?
+
+I learned that wind is a behaviour that can be swapped and not a type of cell. So I created a WindType interface, implemented by NoWind and CardinalWind.
 
 **5.3.** Paste one code snippet that you are especially proud of. Explain why it goes beyond what was done in class.
