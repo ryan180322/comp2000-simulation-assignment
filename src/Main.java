@@ -1,7 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.List;
+//import java.util.List;
+import java.util.Map;
 
 public class Main extends JPanel {
     private Grid grid;
@@ -54,10 +55,18 @@ public class Main extends JPanel {
     }
 
     private void updateStatsLabel(JLabel label) {
-        List<Integer> stats = grid.getStats();
-        // List<Integer> guarantees 3 elements at indices 0, 1, 2
-        label.setText(String.format("Trees: %d | Fires: %d | Empties: %d",
-            stats.get(0), stats.get(1), stats.get(2)));
+        Map<Class<?>, Long> stats = grid.getStats();
+        if (stats.size() == 0) {
+            label.setText("");
+            return;
+        }
+        // formatting
+        String text = "";
+        for (Map.Entry<Class<?>, Long> entry : stats.entrySet()) {
+            text += String.format(" | %s: %d", entry.getKey().getSimpleName(), entry.getValue());
+        }
+        text += " | ";
+        label.setText(text);
     }
 
 

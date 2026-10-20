@@ -24,4 +24,8 @@ public class FireCell extends Cell {
         int g = Math.clamp((int) (255 * t), 0, 255);
         return new java.awt.Color(r, g, 0);
     }
+
+    public String toString() {
+        return "Fires";
+    }
 }

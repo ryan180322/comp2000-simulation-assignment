@@ -1,5 +1,8 @@
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+import java.util.Arrays;
+//import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Grid {
     private final int width;
@@ -91,19 +94,10 @@ public class Grid {
     public int getWidth() { return width; }
     public int getHeight() { return height; }
 
-    public List<Integer> getStats() {
-        int trees = 0, fires = 0, empties = 0;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (cells[x][y] instanceof TreeCell) trees++;
-                else if (cells[x][y] instanceof FireCell) fires++;
-                else if (cells[x][y] instanceof EmptyCell) empties++;
-            }
-        }
-        List<Integer> stats = new ArrayList<>();
-        stats.add(trees);
-        stats.add(fires);
-        stats.add(empties);
+    public Map<Class<?>, Long> getStats() {
+        Map<Class<?>, Long> stats = Arrays.stream(cells)
+        .flatMap(Arrays::stream)
+        .collect(Collectors.groupingBy(Cell::getClass, Collectors.counting()));
         return stats;
     }
 

@@ -54,4 +54,8 @@ public class TreeCell extends Cell {
         int shade = Math.max(50, 200 - age);
         return new java.awt.Color(0, shade, 0);
     }
+
+    public String toString() {
+        return "Trees";
+    }
 }

@@ -12,4 +12,8 @@ public class EmptyCell extends Cell {
     public java.awt.Color getColor() {
         return new java.awt.Color(128, 128, 128); // Grey
     }
+
+    public String toString() {
+        return "Empties";
+    }
 }
