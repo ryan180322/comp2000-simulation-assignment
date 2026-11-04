@@ -1,10 +1,10 @@
-//import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.List;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Grid {
     private final int width;
@@ -64,46 +64,48 @@ public class Grid {
     }
 
     public Cell getCell(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+        if (!inBounds(x, y)) {
             throw new InvalidGridPositionException(x, y, width, height);
         }
         return cells[x][y];
     }
 
     public void setCell(int x, int y, Cell newCell) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+        if (!inBounds(x, y)) {
             throw new InvalidGridPositionException(x, y, width, height);
         }
         cells[x][y] = newCell;
     }
 
+    /** Non-throwing bounds check. Lets callers filter out-of-bounds probes
+     *  instead of using exceptions as flow control (Week 6 lesson). */
+    public boolean inBounds(int x, int y) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    /** Every cell as one flat Stream — the 2D→1D flattening that the whole
+     *  stats/observer layer is built on (Week 10 flatMap). */
+    public Stream<Cell> cellStream() {
+        return Arrays.stream(cells).flatMap(Arrays::stream);
+    }
+
     public void tick() {
-        // create snapshot
-        Cell[][] snapshot = new Cell[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                snapshot[x][y] = cells[x][y];
-            }
-        }
+        // Snapshot via streams: each row is shallow-copied, one expression,
+        // no manual index bookkeeping.
+        Cell[][] snapshot = Arrays.stream(cells)
+                .map(Cell[]::clone)
+                .toArray(Cell[][]::new);
+        Grid snapView = new SnapshotGrid(snapshot).createGrid();
 
         // update all cells using the snapshot
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Cell cell = cells[x][y];
-                cell.update(new SnapshotGrid(snapshot).createGrid(), this, windType);
-            }
-        }
+        cellStream().forEach(cell -> cell.update(snapView, this, windType));
 
-        // grow tree
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (cells[x][y] instanceof EmptyCell) {
-                    if (Math.random() < treeGrowthRate) {
-                        cells[x][y] = new TreeCell(x, y);
-                    }
-                }
-            }
-        }
+        // grow tree: filter → map to replanting decisions → apply
+        IntStream.range(0, width * height)
+                .filter(i -> cells[i % width][i / width] instanceof EmptyCell
+                          && Math.random() < treeGrowthRate)
+                .forEach(i -> cells[i % width][i / width] =
+                        new TreeCell(i % width, i / width));
 
         // Observer pattern: state change finished -> broadcast once.
         notifyObservers();
@@ -113,10 +115,14 @@ public class Grid {
     public int getHeight() { return height; }
 
     public Map<Class<?>, Long> getStats() {
-        Map<Class<?>, Long> stats = Arrays.stream(cells)
-        .flatMap(Arrays::stream)
-        .collect(Collectors.groupingBy(Cell::getClass, Collectors.counting()));
-        return stats;
+        return cellStream()
+                .collect(Collectors.groupingBy(Cell::getClass, Collectors.counting()));
+    }
+
+    /** Short-circuit terminal op: true as soon as any burning cell is found.
+     *  Used by Main to auto-pause a dead simulation (Week 10 EPIC idea ③). */
+    public boolean anyFire() {
+        return cellStream().anyMatch(c -> c instanceof FireCell);
     }
 
     private class SnapshotGrid {
@@ -131,13 +137,10 @@ public class Grid {
     }
 
     public String toString() {
-        String output = "";
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                output += cells[j][i];
-            }
-            output += "\n";
-        }
-        return output;
+        // rows joined with newline; each row is the cells' toString concatenated
+        return Arrays.stream(cells)
+                .map(row -> Arrays.stream(row).map(Cell::toString)
+                                        .collect(Collectors.joining()))
+                .collect(Collectors.joining("\n"));
     }
 }

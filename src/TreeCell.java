@@ -1,3 +1,5 @@
+import java.util.stream.IntStream;
+
 public class TreeCell extends Cell {
     private int age;
     private static final int MAX_AGE = 100;
@@ -27,23 +29,21 @@ public class TreeCell extends Cell {
             return;
         }
 
-        // fire spread
+        // fire spread: scan the 4 neighbours as a stream.
+        // filter(inBounds) replaces the old try/catch — the exception stays a
+        // genuine error signal instead of being used as flow control (Week 6).
+        // anyMatch short-circuits on the first igniting neighbour.
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
-        for (int i = 0; i < 4; i++) {
-            try {
-                Cell neighbour = snapGrid.getCell(x + dx[i], y + dy[i]);
-                if (neighbour instanceof FireCell) {
+        boolean ignites = IntStream.range(0, 4)
+                .filter(i -> snapGrid.inBounds(x + dx[i], y + dy[i]))
+                .filter(i -> snapGrid.getCell(x + dx[i], y + dy[i]) instanceof FireCell)
+                .anyMatch(i -> {
                     double windMod = wind.getSpreadMultiplier(-dx[i], -dy[i]);
                     double adj = Math.min(fireSpreadProb * windMod, 1.0);
-                    if (Math.random() < adj) {
-                        grid.setCell(x, y, new FireCell(x, y));
-                    }
-                }
-            } catch (InvalidGridPositionException e) {
-                continue;
-            }
-        }
+                    return Math.random() < adj;
+                });
+        if (ignites) grid.setCell(x, y, new FireCell(x, y));
     }
 
     public void update(Grid snapGrid, Grid grid) { update(snapGrid, grid, new NoWind()); }

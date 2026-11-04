@@ -3,6 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 //import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Main extends JPanel {
     private Grid grid;
@@ -31,11 +32,8 @@ public class Main extends JPanel {
         resetBtn.addActionListener(e -> resetSimulation());
 
         JComboBox<WindDirection> windBox = new JComboBox<>();
-        windBox.addItem(WindDirection.NONE);
-        windBox.addItem(WindDirection.NORTH);
-        windBox.addItem(WindDirection.SOUTH);
-        windBox.addItem(WindDirection.EAST);
-        windBox.addItem(WindDirection.WEST);
+        // Stream the enum constants into the combo instead of five addItem calls
+        java.util.Arrays.stream(WindDirection.values()).forEach(windBox::addItem);
         windBox.addActionListener(e -> {
             WindDirection dir = (WindDirection) windBox.getSelectedItem();
             grid.setWindType(dir == WindDirection.NONE ? new NoWind() : new CardinalWind(dir));
@@ -73,12 +71,11 @@ public class Main extends JPanel {
             label.setText("");
             return;
         }
-        // formatting
-        String text = "";
-        for (Map.Entry<Class<?>, Long> entry : stats.entrySet()) {
-            text += String.format(" | %s: %d", entry.getKey().getSimpleName(), entry.getValue());
-        }
-        text += " | ";
+        // Stream the entries straight into the display string:
+        // entry -> "Name: count", joined with " | ". No StringBuilder loop.
+        String text = stats.entrySet().stream()
+                .map(e -> String.format(" %s: %d", e.getKey().getSimpleName(), e.getValue()))
+                .collect(Collectors.joining(" | ", " | ", " | "));
         label.setText(text);
     }
 
@@ -92,6 +89,9 @@ public class Main extends JPanel {
                 // Observer pattern: one call. Display and the stats label are
                 // notified by the Grid itself — Main does not poll them.
                 grid.tick();
+                // anyFire() short-circuits: when the last flame dies, stop the
+                // timer instead of spinning on an inert forest.
+                if (!grid.anyFire()) stopSimulation();
             }
         });
         timer.start();
