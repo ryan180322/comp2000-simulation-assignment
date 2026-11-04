@@ -2,4 +2,4 @@
 out/
 *.class
 *.iml
-/GDT2/Library
+.vscode/*
