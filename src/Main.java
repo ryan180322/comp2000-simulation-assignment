@@ -44,6 +44,11 @@ public class Main extends JPanel {
         statsLabel = new JLabel();
         updateStatsLabel(statsLabel);
 
+        // Observer pattern: everyone watching the simulation subscribes to the
+        // Grid. Main no longer has to remember to refresh each widget inside
+        // the timer loop — the Grid pushes every tick to its observers.
+        attachObservers(grid);
+
         controls.add(startBtn);
         controls.add(stopBtn);
         controls.add(resetBtn);
@@ -52,6 +57,14 @@ public class Main extends JPanel {
 
         add(display, BorderLayout.CENTER);
         add(controls, BorderLayout.SOUTH);
+    }
+
+    /** Observer pattern: subscribe every widget that watches this Grid.
+     *  Called again after Reset creates a fresh Grid, so subscriptions are
+     *  never lost (the memory-leak / stale-subscription pitfall). */
+    private void attachObservers(Grid g) {
+        g.registerObserver(display);
+        g.registerObserver(newGrid -> updateStatsLabel(statsLabel));
     }
 
     private void updateStatsLabel(JLabel label) {
@@ -76,9 +89,9 @@ public class Main extends JPanel {
         timer = new Timer(TICK_DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Observer pattern: one call. Display and the stats label are
+                // notified by the Grid itself — Main does not poll them.
                 grid.tick();
-                display.update(grid);
-                updateStatsLabel(statsLabel);
             }
         });
         timer.start();
@@ -92,6 +105,7 @@ public class Main extends JPanel {
     private void resetSimulation() {
         stopSimulation();
         grid = new Grid(WIDTH, HEIGHT);
+        attachObservers(grid);
         display.update(grid);
     }
 

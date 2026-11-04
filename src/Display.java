@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class Display extends JPanel {
+public class Display extends JPanel implements Observer {
     private static final int CELL_SIZE = 20;
     private Grid grid;
 
@@ -14,6 +14,8 @@ public class Display extends JPanel {
         this.setBackground(Color.BLACK);
     }
 
+    /** Observer role: the Grid calls this after every tick. */
+    @Override
     public void update(Grid grid) {
         this.grid = grid;
         repaint();

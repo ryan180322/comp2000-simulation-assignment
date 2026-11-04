@@ -1,6 +1,8 @@
 //import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Arrays;
 //import java.util.List;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,19 @@ public class Grid {
     private Cell[][] cells;
     private final double treeGrowthRate;
     private WindType windType;
+
+    // Observer pattern: this Grid is the Subject. Everything that watches
+    // the simulation (Display, stats label, ...) subscribes here instead of
+    // being hard-wired into Main's tick loop.
+    private final List<Observer> observers = new ArrayList<>();
+
+    public void registerObserver(Observer o)  { observers.add(o); }
+    public void removeObserver(Observer o)    { observers.remove(o); }
+
+    /** Push-style notification: hand each observer the current grid. */
+    private void notifyObservers() {
+        for (Observer o : observers) o.update(this);
+    }
 
     public Grid(int width, int height) {
         this(width, height, new NoWind());
@@ -89,6 +104,9 @@ public class Grid {
                 }
             }
         }
+
+        // Observer pattern: state change finished -> broadcast once.
+        notifyObservers();
     }
 
     public int getWidth() { return width; }
