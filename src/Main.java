@@ -31,20 +31,19 @@ public class Main extends JPanel {
         stopBtn.addActionListener(e -> stopSimulation());
         resetBtn.addActionListener(e -> resetSimulation());
 
-        JComboBox<WindDirection> windBox = new JComboBox<>();
-        // Stream the enum constants into the combo instead of five addItem calls
-        java.util.Arrays.stream(WindDirection.values()).forEach(windBox::addItem);
+        JComboBox<WindPreset> windBox = new JComboBox<>();
+        // Stream the enum constants into the combo instead of nine addItem calls
+        java.util.Arrays.stream(WindPreset.values()).forEach(windBox::addItem);
         windBox.addActionListener(e -> {
-            WindDirection dir = (WindDirection) windBox.getSelectedItem();
-            grid.setWindType(dir == WindDirection.NONE ? new NoWind() : new CardinalWind(dir));
+            // Factory enum: the combo item knows how to build its own Strategy,
+            // so Main has no switch over wind types at all.
+            WindPreset preset = (WindPreset) windBox.getSelectedItem();
+            if (preset != null) grid.setWindType(preset.create());
         });
 
         statsLabel = new JLabel();
         updateStatsLabel(statsLabel);
 
-        // Observer pattern: everyone watching the simulation subscribes to the
-        // Grid. Main no longer has to remember to refresh each widget inside
-        // the timer loop — the Grid pushes every tick to its observers.
         attachObservers(grid);
 
         controls.add(startBtn);
@@ -57,9 +56,6 @@ public class Main extends JPanel {
         add(controls, BorderLayout.SOUTH);
     }
 
-    /** Observer pattern: subscribe every widget that watches this Grid.
-     *  Called again after Reset creates a fresh Grid, so subscriptions are
-     *  never lost (the memory-leak / stale-subscription pitfall). */
     private void attachObservers(Grid g) {
         g.registerObserver(display);
         g.registerObserver(newGrid -> updateStatsLabel(statsLabel));
@@ -76,6 +72,7 @@ public class Main extends JPanel {
         String text = stats.entrySet().stream()
                 .map(e -> String.format(" %s: %d", e.getKey().getSimpleName(), e.getValue()))
                 .collect(Collectors.joining(" | ", " | ", " | "));
+        if (grid.isRaining()) text += "  (raining)";
         label.setText(text);
     }
 
@@ -86,8 +83,6 @@ public class Main extends JPanel {
         timer = new Timer(TICK_DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Observer pattern: one call. Display and the stats label are
-                // notified by the Grid itself — Main does not poll them.
                 grid.tick();
                 // anyFire() short-circuits: when the last flame dies, stop the
                 // timer instead of spinning on an inert forest.

@@ -34,5 +34,10 @@ public class Display extends JPanel implements Observer {
                 }
             }
         }
+        // a light blue veil while it is raining
+        if (grid.isRaining()) {
+            g.setColor(new Color(100, 150, 255, 60));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
     }
 }

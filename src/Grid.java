@@ -13,6 +13,13 @@ public class Grid {
     private final double treeGrowthRate;
     private WindType windType;
 
+    // Creativity feature: weather. A storm front periodically sweeps the map,
+    // dousing fires and briefly boosting tree regrowth. rainTicks > 0 means
+    // it is raining right now.
+    private int rainTicks = 0;
+    private static final double RAIN_CHANCE = 0.003;   // storm starts per tick
+    private static final int   RAIN_LENGTH = 8;        // ticks a storm lasts
+
     // Observer pattern: this Grid is the Subject. Everything that watches
     // the simulation (Display, stats label, ...) subscribes here instead of
     // being hard-wired into Main's tick loop.
@@ -49,7 +56,6 @@ public class Grid {
     private void initialize() {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                // hardcoded
                 if (Math.random() < 0.5) {
                     cells[x][y] = new TreeCell(x, y);
                 } else {
@@ -57,9 +63,22 @@ public class Grid {
                 }
             }
         }
-        // Place a single fire at centre
+        // Scatter 2-3 lakes as small blobs (random walk of 4-7 cells each).
+        int lakes = 2 + (int) (Math.random() * 2);
+        for (int k = 0; k < lakes; k++) {
+            int lx = 1 + (int) (Math.random() * (width - 2));
+            int ly = 1 + (int) (Math.random() * (height - 2));
+            int size = 4 + (int) (Math.random() * 4);
+            for (int s = 0; s < size; s++) {
+                cells[lx][ly] = new WaterCell(lx, ly);
+                lx = Math.min(width - 1, Math.max(0, lx + (int) (Math.random() * 3) - 1));
+                ly = Math.min(height - 1, Math.max(0, ly + (int) (Math.random() * 3) - 1));
+            }
+        }
+        // Place a single fire at centre (nudge off water if unlucky)
         int cx = width / 2;
         int cy = height / 2;
+        if (cells[cx][cy] instanceof WaterCell) cx = (cx + 2) % width;
         cells[cx][cy] = new FireCell(cx, cy);
     }
 
@@ -77,19 +96,24 @@ public class Grid {
         cells[x][y] = newCell;
     }
 
-    /** Non-throwing bounds check. Lets callers filter out-of-bounds probes
-     *  instead of using exceptions as flow control (Week 6 lesson). */
+
     public boolean inBounds(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
 
-    /** Every cell as one flat Stream — the 2D→1D flattening that the whole
-     *  stats/observer layer is built on (Week 10 flatMap). */
     public Stream<Cell> cellStream() {
         return Arrays.stream(cells).flatMap(Arrays::stream);
     }
 
     public void tick() {
+        // Let the wind Strategy advance its own clock (no-op for static winds).
+        windType.advance();
+
+        // Weather: storms roll in at random, last a few ticks, then pass.
+        if (rainTicks == 0 && Math.random() < RAIN_CHANCE) rainTicks = RAIN_LENGTH;
+        boolean raining = rainTicks > 0;
+        if (raining) rainTicks--;
+
         // Snapshot via streams: each row is shallow-copied, one expression,
         // no manual index bookkeeping.
         Cell[][] snapshot = Arrays.stream(cells)
@@ -100,16 +124,26 @@ public class Grid {
         // update all cells using the snapshot
         cellStream().forEach(cell -> cell.update(snapView, this, windType));
 
-        // grow tree: filter → map to replanting decisions → apply
+        if (raining) {
+            IntStream.range(0, width * height)
+                    .filter(i -> cells[i % width][i / width] instanceof FireCell
+                              && Math.random() < 0.4)
+                    .forEach(i -> cells[i % width][i / width] =
+                            new EmptyCell(i % width, i / width));
+        }
+
+        double growth = raining ? treeGrowthRate * 3 : treeGrowthRate;
         IntStream.range(0, width * height)
                 .filter(i -> cells[i % width][i / width] instanceof EmptyCell
-                          && Math.random() < treeGrowthRate)
+                          && Math.random() < growth)
                 .forEach(i -> cells[i % width][i / width] =
                         new TreeCell(i % width, i / width));
 
         // Observer pattern: state change finished -> broadcast once.
         notifyObservers();
     }
+
+    public boolean isRaining() { return rainTicks > 0; }
 
     public int getWidth() { return width; }
     public int getHeight() { return height; }
