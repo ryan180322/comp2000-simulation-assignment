@@ -154,8 +154,7 @@ public class Grid {
     public int getHeight() { return height; }
 
     public Map<Class<?>, Long> getStats() {
-        return cellStream().collect(Collectors.groupingBy(Cell::getClass,
-                () -> new TreeMap<>(BY_TYPE_NAME), Collectors.counting()));
+        return cellStream().collect(Collectors.groupingBy(Cell::getClass, Collectors.counting()));
     }
 
     public boolean anyFire() {
