@@ -11,7 +11,9 @@ public class Main extends JPanel {
     private boolean running = false;
     private Timer timer;
     private JLabel statsLabel;
+
     private WindPreset currentPreset = WindPreset.NONE;
+    private JComboBox<WindPreset> windBox;
     private static final int WIDTH = 25;
     private static final int HEIGHT = 25;
     private static final int TICK_DELAY = 100;
@@ -33,6 +35,7 @@ public class Main extends JPanel {
         resetBtn.addActionListener(e -> resetSimulation());
 
         JComboBox<WindPreset> windBox = new JComboBox<>();
+        this.windBox = windBox;
         // Stream the enum constants into the combo instead of nine addItem calls
         java.util.Arrays.stream(WindPreset.values()).forEach(windBox::addItem);
         windBox.addActionListener(e -> {
@@ -83,6 +86,7 @@ public class Main extends JPanel {
 
     private void startSimulation() {
         if (running) return;
+        if (!grid.anyFire()) return;
         running = true;
         timer = new Timer(TICK_DELAY, new ActionListener() {
             @Override
@@ -102,7 +106,6 @@ public class Main extends JPanel {
     private void resetSimulation() {
         stopSimulation();
         grid = new Grid(WIDTH, HEIGHT);
-
         grid.setWindType(currentPreset.create());
         attachObservers(grid);
         display.update(grid);
