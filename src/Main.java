@@ -11,6 +11,7 @@ public class Main extends JPanel {
     private boolean running = false;
     private Timer timer;
     private JLabel statsLabel;
+    private WindPreset currentPreset = WindPreset.NONE;
     private static final int WIDTH = 25;
     private static final int HEIGHT = 25;
     private static final int TICK_DELAY = 100;
@@ -38,7 +39,10 @@ public class Main extends JPanel {
             // Factory enum: the combo item knows how to build its own Strategy,
             // so Main has no switch over wind types at all.
             WindPreset preset = (WindPreset) windBox.getSelectedItem();
-            if (preset != null) grid.setWindType(preset.create());
+            if (preset != null) {
+                grid.setWindType(preset.create());
+                currentPreset = preset;
+            }
         });
 
         statsLabel = new JLabel();
@@ -84,8 +88,6 @@ public class Main extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 grid.tick();
-                // anyFire() short-circuits: when the last flame dies, stop the
-                // timer instead of spinning on an inert forest.
                 if (!grid.anyFire()) stopSimulation();
             }
         });
@@ -100,8 +102,11 @@ public class Main extends JPanel {
     private void resetSimulation() {
         stopSimulation();
         grid = new Grid(WIDTH, HEIGHT);
+
+        grid.setWindType(currentPreset.create());
         attachObservers(grid);
         display.update(grid);
+        updateStatsLabel(statsLabel);
     }
 
     public static void main(String[] args) {
