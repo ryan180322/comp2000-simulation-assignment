@@ -17,6 +17,8 @@ public class Main extends JPanel {
     private static final int WIDTH = 25;
     private static final int HEIGHT = 25;
     private static final int TICK_DELAY = 100;
+    /** Placeholder so the stats row is never blank (a blank label reads as "broken"). */
+    private static final String NO_STATS = " no cells to count ";
 
     public Main() {
         setLayout(new BorderLayout());
@@ -48,7 +50,13 @@ public class Main extends JPanel {
             }
         });
 
-        statsLabel = new JLabel();
+        statsLabel = new JLabel(" ");
+        statsLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        statsLabel.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 4));
+        Dimension statsSize = new Dimension(display.getPreferredSize().width,
+                                            statsLabel.getPreferredSize().height);
+        statsLabel.setPreferredSize(statsSize);
+        statsLabel.setMinimumSize(statsSize);
         updateStatsLabel(statsLabel);
 
         attachObservers(grid);
@@ -57,10 +65,13 @@ public class Main extends JPanel {
         controls.add(stopBtn);
         controls.add(resetBtn);
         controls.add(windBox);
-        controls.add(statsLabel);
+
+        JPanel south = new JPanel(new BorderLayout());
+        south.add(controls, BorderLayout.NORTH);
+        south.add(statsLabel, BorderLayout.CENTER);
 
         add(display, BorderLayout.CENTER);
-        add(controls, BorderLayout.SOUTH);
+        add(south, BorderLayout.SOUTH);
     }
 
     private void attachObservers(Grid g) {
@@ -70,8 +81,8 @@ public class Main extends JPanel {
 
     private void updateStatsLabel(JLabel label) {
         Map<Class<?>, Long> stats = grid.getStats();
-        if (stats.size() == 0) {
-            label.setText("");
+        if (stats.isEmpty()) {
+            label.setText(NO_STATS);
             return;
         }
         // Stream the entries straight into the display string:

@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 public class Grid {
     private final int width;
     private final int height;
@@ -24,6 +25,10 @@ public class Grid {
     // the simulation (Display, stats label, ...) subscribes here instead of
     // being hard-wired into Main's tick loop.
     private final List<Observer> observers = new ArrayList<>();
+
+    /** Class has no natural order, so stats keys are sorted by type name. */
+    private static final Comparator<Class<?>> BY_TYPE_NAME =
+            Comparator.comparing(Class::getName);
 
     public void registerObserver(Observer o)  { observers.add(o); }
     public void removeObserver(Observer o)    { observers.remove(o); }
@@ -149,12 +154,10 @@ public class Grid {
     public int getHeight() { return height; }
 
     public Map<Class<?>, Long> getStats() {
-        return cellStream()
-                .collect(Collectors.groupingBy(Cell::getClass, Collectors.counting()));
+        return cellStream().collect(Collectors.groupingBy(Cell::getClass,
+                () -> new TreeMap<>(BY_TYPE_NAME), Collectors.counting()));
     }
 
-    /** Short-circuit terminal op: true as soon as any burning cell is found.
-     *  Used by Main to auto-pause a dead simulation (Week 10 EPIC idea ③). */
     public boolean anyFire() {
         return cellStream().anyMatch(c -> c instanceof FireCell);
     }
