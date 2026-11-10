@@ -14,26 +14,18 @@ public class Grid {
     private final double treeGrowthRate;
     private WindType windType;
 
-    // Creativity feature: weather. A storm front periodically sweeps the map,
-    // dousing fires and briefly boosting tree regrowth. rainTicks > 0 means
-    // it is raining right now.
     private int rainTicks = 0;
     private static final double RAIN_CHANCE = 0.003;   // storm starts per tick
     private static final int   RAIN_LENGTH = 8;        // ticks a storm lasts
 
-    // Observer pattern: this Grid is the Subject. Everything that watches
-    // the simulation (Display, stats label, ...) subscribes here instead of
-    // being hard-wired into Main's tick loop.
     private final List<Observer> observers = new ArrayList<>();
 
-    /** Class has no natural order, so stats keys are sorted by type name. */
     private static final Comparator<Class<?>> BY_TYPE_NAME =
             Comparator.comparing(Class::getName);
 
     public void registerObserver(Observer o)  { observers.add(o); }
     public void removeObserver(Observer o)    { observers.remove(o); }
 
-    /** Push-style notification: hand each observer the current grid. */
     private void notifyObservers() {
         for (Observer o : observers) o.update(this);
     }

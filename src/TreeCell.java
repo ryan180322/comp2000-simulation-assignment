@@ -29,10 +29,6 @@ public class TreeCell extends Cell {
             return;
         }
 
-        // fire spread: scan the 4 neighbours as a stream.
-        // filter(inBounds) replaces the old try/catch — the exception stays a
-        // genuine error signal instead of being used as flow control (Week 6).
-        // anyMatch short-circuits on the first igniting neighbour.
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
         boolean ignites = IntStream.range(0, 4)
